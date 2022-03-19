@@ -1,0 +1,158 @@
+{
+        "categories": [
+        {
+            "id": 0,
+            "name": "Cards",
+            "supercategory": "none"
+        },
+        {
+            "id": 1,
+            "name": "1",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 2,
+            "name": "2",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 3,
+            "name": "3",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 4,
+            "name": "4",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 5,
+            "name": "5",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 6,
+            "name": "6",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 7,
+            "name": "7",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 8,
+            "name": "8",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 9,
+            "name": "9",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 10,
+            "name": "A",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 11,
+            "name": "B",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 12,
+            "name": "C",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 13,
+            "name": "D",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 14,
+            "name": "DOWN",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 15,
+            "name": "E",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 16,
+            "name": "F",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 17,
+            "name": "G",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 18,
+            "name": "H",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 19,
+            "name": "LEFT",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 20,
+            "name": "RIGHT",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 21,
+            "name": "S",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 22,
+            "name": "U",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 23,
+            "name": "UP",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 24,
+            "name": "V",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 25,
+            "name": "W",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 26,
+            "name": "X",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 27,
+            "name": "Y",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 28,
+            "name": "Z",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 29,
+            "name": "circle",
+            "supercategory": "Cards"
+        },
+        {
+            "id": 30,
+            "name": "target",
+            "supercategory": "Cards"
+        }]
+}
