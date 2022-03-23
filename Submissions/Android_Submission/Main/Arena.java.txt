@@ -1,0 +1,1184 @@
+package com.example.mdp_new;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.widget.Toast;
+import android.animation.ObjectAnimator;
+import android.util.Log;
+import android.widget.ImageButton;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
+import androichange_x.appcompat.app.AppCompatActivity;
+import androichange_x.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Arena extends AppCompatActivity {
+    private static final int snap_grid_int = 40;
+
+    private static final int animator_duration = 1000;
+
+    private boolean isobs1LongClicked = false;
+    private boolean isobs2LongClicked = false;
+    private boolean isobs3LongClicked = false;
+    private boolean isobs4LongClicked = false;
+    private boolean isobs5LongClicked = false;
+
+    private int sequence = 0;
+
+    Button IRButton, SPButton, resetButton, preset1Button, preset2Button, preset3Button, timerButton;
+
+    ImageView obs1, obs2, obs3, obs4, obs5, obs6, obs7, obs8;
+    ImageView car;
+
+    TextView car_x, car_y, car_dir;
+
+    Map<Integer, ImageView> obstacles;
+
+    Map<String, String> commands = new HashMap<String, String>() {{
+        put("forward", "0100");
+        put("reverse", "0101");
+        put("turnLeft", "0902");
+        put("turnRight", "0903");
+    }};
+
+    Map<String, Integer> rsc = new HashMap<String, Integer>() {{
+        put("o1n", R.drawable.obstacle_1_n);
+        put("o1e", R.drawable.obstacle_1_e);
+        put("o1s", R.drawable.obstacle_1_s);
+        put("o1w", R.drawable.obstacle_1_w);
+
+        put("o2n", R.drawable.obstacle_2_n);
+        put("o2e", R.drawable.obstacle_2_e);
+        put("o2s", R.drawable.obstacle_2_s);
+        put("o2w", R.drawable.obstacle_2_w);
+
+        put("o3n", R.drawable.obstacle_3_n);
+        put("o3e", R.drawable.obstacle_3_e);
+        put("o3s", R.drawable.obstacle_3_s);
+        put("o3w", R.drawable.obstacle_3_w);
+
+        put("o4n", R.drawable.obstacle_4_n);
+        put("o4e", R.drawable.obstacle_4_e);
+        put("o4s", R.drawable.obstacle_4_s);
+        put("o4w", R.drawable.obstacle_4_w);
+
+        put("o5n", R.drawable.obstacle_5_n);
+        put("o5e", R.drawable.obstacle_5_e);
+        put("o5s", R.drawable.obstacle_5_s);
+        put("o5w", R.drawable.obstacle_5_w);
+
+        put("o6n", R.drawable.obstacle_6_n);
+        put("o6e", R.drawable.obstacle_6_e);
+        put("o6s", R.drawable.obstacle_6_s);
+        put("o6w", R.drawable.obstacle_6_w);
+
+        put("o7n", R.drawable.obstacle_7_n);
+        put("o7e", R.drawable.obstacle_7_e);
+        put("o7s", R.drawable.obstacle_7_s);
+        put("o7w", R.drawable.obstacle_7_w);
+
+        put("o8n", R.drawable.obstacle_8_n);
+        put("o8e", R.drawable.obstacle_8_e);
+        put("o8s", R.drawable.obstacle_8_s);
+        put("o8w", R.drawable.obstacle_8_w);
+
+        put("11", R.drawable.number_1);
+        put("12", R.drawable.number_2);
+        put("13", R.drawable.number_3);
+        put("14", R.drawable.number_4);
+        put("15", R.drawable.number_5);
+        put("16", R.drawable.number_6);
+        put("17", R.drawable.number_7);
+        put("18", R.drawable.number_8);
+        put("19", R.drawable.number_9);
+
+        put("20", R.drawable.alphabet_a);
+        put("21", R.drawable.alphabet_b);
+        put("22", R.drawable.alphabet_c);
+        put("23", R.drawable.alphabet_d);
+        put("24", R.drawable.alphabet_e);
+        put("25", R.drawable.alphabet_f);
+        put("26", R.drawable.alphabet_g);
+        put("27", R.drawable.alphabet_h);
+        put("28", R.drawable.alphabet_s);
+        put("29", R.drawable.alphabet_t);
+        put("30", R.drawable.alphabet_u);
+        put("31", R.drawable.alphabet_v);
+        put("32", R.drawable.alphabet_w);
+        put("33", R.drawable.alphabet_x);
+        put("34", R.drawable.alphabet_y);
+        put("35", R.drawable.alphabet_z);
+
+        put("36", R.drawable.arrow_up);
+        put("37", R.drawable.arrow_down);
+        put("39", R.drawable.arrow_left);
+        put("38", R.drawable.arrow_right);
+        put("41", R.drawable.bullseye);
+        put("40", R.drawable.circle);
+
+        put("42", R.drawable.yellow_question_mark);
+        put("43", R.drawable.red_question_mark);
+    }};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.arena);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter("incomingMessage"));
+        obs1 = findViewById(R.id.obs1);
+
+        obs2 = findViewById(R.id.obs2);
+        obs3 = findViewById(R.id.obs3);
+        obs4 = findViewById(R.id.obs4);
+        obs5 = findViewById(R.id.obs5);
+        obs6 = findViewById(R.id.obs6);
+        obs7 = findViewById(R.id.obs7);
+        obs8 = findViewById(R.id.obs8);
+
+        obstacles = new HashMap<Integer, ImageView>() {{
+            put(1, obs1);
+            put(2, obs2);
+            put(3, obs3);
+            put(4, obs4);
+            put(5, obs5);
+            put(6, obs6);
+            put(7, obs7);
+            put(8, obs8);
+        }};
+
+        obs1.setOnClickListener(view -> {
+            obs1.setRotation((obs1.getRotation() + 90) % 360);
+            int direction = (int) obs1.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs1.setImageResource(rsc.get("o1n"));
+                    break;
+                case 1:
+                    obs1.setImageResource(rsc.get("o1e"));
+                    break;
+                case 2:
+                    obs1.setImageResource(rsc.get("o1s"));
+                    break;
+                case 3:
+                    obs1.setImageResource(rsc.get("o1w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs2.setOnClickListener(view -> {
+            obs2.setRotation((obs2.getRotation() + 90) % 360);
+            int direction = (int) obs2.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs2.setImageResource(rsc.get("o2n"));
+                    break;
+                case 1:
+                    obs2.setImageResource(rsc.get("o2e"));
+                    break;
+                case 2:
+                    obs2.setImageResource(rsc.get("o2s"));
+                    break;
+                case 3:
+                    obs2.setImageResource(rsc.get("o2w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs3.setOnClickListener(view -> {
+            obs3.setRotation((obs3.getRotation() + 90) % 360);
+            int direction = (int) obs3.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs3.setImageResource(rsc.get("o3n"));
+                    break;
+                case 1:
+                    obs3.setImageResource(rsc.get("o3e"));
+                    break;
+                case 2:
+                    obs3.setImageResource(rsc.get("o3s"));
+                    break;
+                case 3:
+                    obs3.setImageResource(rsc.get("o3w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs4.setOnClickListener(view -> {
+            obs4.setRotation((obs4.getRotation() + 90) % 360);
+            int direction = (int) obs4.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs4.setImageResource(rsc.get("o4n"));
+                    break;
+                case 1:
+                    obs4.setImageResource(rsc.get("o4e"));
+                    break;
+                case 2:
+                    obs4.setImageResource(rsc.get("o4s"));
+                    break;
+                case 3:
+                    obs4.setImageResource(rsc.get("o4w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs5.setOnClickListener(view -> {
+            obs5.setRotation((obs5.getRotation() + 90) % 360);
+            int direction = (int) obs5.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs5.setImageResource(rsc.get("o5n"));
+                    break;
+                case 1:
+                    obs5.setImageResource(rsc.get("o5e"));
+                    break;
+                case 2:
+                    obs5.setImageResource(rsc.get("o5s"));
+                    break;
+                case 3:
+                    obs5.setImageResource(rsc.get("o5w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs6.setOnClickListener(view -> {
+            obs6.setRotation((obs6.getRotation() + 90) % 360);
+            int direction = (int) obs6.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs6.setImageResource(rsc.get("o6n"));
+                    break;
+                case 1:
+                    obs6.setImageResource(rsc.get("o6e"));
+                    break;
+                case 2:
+                    obs6.setImageResource(rsc.get("o6s"));
+                    break;
+                case 3:
+                    obs6.setImageResource(rsc.get("o6w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs7.setOnClickListener(view -> {
+            obs7.setRotation((obs7.getRotation() + 90) % 360);
+            int direction = (int) obs7.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs7.setImageResource(rsc.get("o7n"));
+                    break;
+                case 1:
+                    obs7.setImageResource(rsc.get("o7e"));
+                    break;
+                case 2:
+                    obs7.setImageResource(rsc.get("o7s"));
+                    break;
+                case 3:
+                    obs7.setImageResource(rsc.get("o7w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs8.setOnClickListener(view -> {
+            obs8.setRotation((obs8.getRotation() + 90) % 360);
+            int direction = (int) obs8.getRotation();
+            switch (((direction / 90) % 4 + 4) % 4) {
+                case 0:
+                    obs8.setImageResource(rsc.get("o8n"));
+                    break;
+                case 1:
+                    obs8.setImageResource(rsc.get("o8e"));
+                    break;
+                case 2:
+                    obs8.setImageResource(rsc.get("o8s"));
+                    break;
+                case 3:
+                    obs8.setImageResource(rsc.get("o8w"));
+                    break;
+                default:
+                    // Shouldn't reach this case
+                    break;
+            }
+        });
+
+        obs1.setOnLongClickListener(view -> {
+            isobs1LongClicked = true;
+            return false;
+        });
+
+        obs2.setOnLongClickListener(view -> {
+            isobs2LongClicked = true;
+            return false;
+        });
+
+        obs3.setOnLongClickListener(view -> {
+            isobs3LongClicked = true;
+            return false;
+        });
+
+        obs4.setOnLongClickListener(view -> {
+            isobs4LongClicked = true;
+            return false;
+        });
+
+        obs5.setOnLongClickListener(view -> {
+            isobs5LongClicked = true;
+            return false;
+        });
+
+        obs6.setOnLongClickListener(view -> {
+            isobs5LongClicked = true;
+            return false;
+        });
+
+        obs7.setOnLongClickListener(view -> {
+            isobs5LongClicked = true;
+            return false;
+        });
+
+        obs8.setOnLongClickListener(view -> {
+            isobs5LongClicked = true;
+            return false;
+        });
+
+        obs1.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs1LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs1.setX(obs1.getX() + change_x);
+                        obs1.setY(obs1.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs1.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs1.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs1.setX(s_t_X);
+                        obs1.setY(s_t_Y);
+                        isobs1LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs2.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs2LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs2.setX(obs2.getX() + change_x);
+                        obs2.setY(obs2.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs2.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs2.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs2.setX(s_t_X);
+                        obs2.setY(s_t_Y);
+                        isobs2LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs3.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs3LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs3.setX(obs3.getX() + change_x);
+                        obs3.setY(obs3.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs3.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs3.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs3.setX(s_t_X);
+                        obs3.setY(s_t_Y);
+                        isobs3LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs4.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs4LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs4.setX(obs4.getX() + change_x);
+                        obs4.setY(obs4.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs4.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs4.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs4.setX(s_t_X);
+                        obs4.setY(s_t_Y);
+                        isobs4LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs5.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs5LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs5.setX(obs5.getX() + change_x);
+                        obs5.setY(obs5.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs5.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs5.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs5.setX(s_t_X);
+                        obs5.setY(s_t_Y);
+                        isobs5LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs6.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs5LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs6.setX(obs6.getX() + change_x);
+                        obs6.setY(obs6.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs6.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs6.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs6.setX(s_t_X);
+                        obs6.setY(s_t_Y);
+                        isobs5LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs7.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs5LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs7.setX(obs7.getX() + change_x);
+                        obs7.setY(obs7.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs7.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs7.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs7.setX(s_t_X);
+                        obs7.setY(s_t_Y);
+                        isobs5LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        obs8.setOnTouchListener(new View.OnTouchListener() {
+            int x = 0;
+            int y = 0;
+            int change_x = 0;
+            int change_y = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (!isobs5LongClicked) {
+                    return false;
+                }
+                switch (e.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) e.getX();
+                        y = (int) e.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        change_x = (int) e.getX() - x;
+                        change_y = (int) e.getY() - y;
+
+                        obs8.setX(obs8.getX() + change_x);
+                        obs8.setY(obs8.getY() + change_y);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        int s_t_X = ((int) ((obs8.getX() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        int s_t_Y = ((int) ((obs8.getY() + snap_grid_int / 2) / snap_grid_int)) * snap_grid_int;
+                        obs8.setX(s_t_X);
+                        obs8.setY(s_t_Y);
+                        isobs5LongClicked = false;
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        // Declarations
+        IRButton = findViewById(R.id.IRButton);
+        SPButton = findViewById(R.id.SPBtn);
+        resetButton = findViewById(R.id.resetButton);
+        car = findViewById(R.id.car);
+        car_x = findViewById(R.id.x_tv);
+        car_y = findViewById(R.id.y_tv);
+        car_dir = findViewById(R.id.dir_tv);
+        preset1Button = findViewById(R.id.preset1Button);
+        preset2Button = findViewById(R.id.preset2Button);
+        preset3Button = findViewById(R.id.preset3Button);
+        timerButton = findViewById(R.id.timerButton);
+
+        // es
+        IRButton.setOnClickListener(view -> sendObstaclese());
+        SPButton.setOnClickListener(view-> beginSPTask());
+        resetButton.setOnClickListener(view -> resetObstaclesButton());
+        preset1Button.setOnClickListener(view -> setPreset1Button());
+        preset2Button.setOnClickListener(view -> setPreset2Button());
+        preset3Button.setOnClickListener(view -> setPreset3Button());
+        timerButton.setOnClickListener(view -> stopTimerButton());
+
+        // Initialize car to bottom left
+        car.setX(1 * snap_grid_int - snap_grid_int);
+        car.setY(18 * snap_grid_int - snap_grid_int);
+        updateXYDirText();
+
+        // Movement Buttons
+        ImageButton forwardButton = (ImageButton) findViewById(R.id.forwardButton);
+        forwardButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                Log.d("COMMS DEBUG", "forward");
+
+                // Bluetooth message
+                if (BluetoothConnectionService.BluetoothConnectionStatus) {
+                    byte[] bytes = "STM:w".getBytes(Charset.defaultCharset());
+                    BluetoothConnectionService.write(bytes);
+                }
+
+                // Animation
+                int direction = (int) car.getRotation();
+                int new_x, new_y;
+                ObjectAnimator animator;
+                switch (((direction / 90) % 4 + 4) % 4) {
+                    case 0: //North
+                        new_y = (int) car.getY() - snap_grid_int;
+                        car.setY(new_y);
+                        animator = ObjectAnimator.ofFloat(car, "y", new_y);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    case 1:
+                        new_x = (int) car.getX() + snap_grid_int;
+                        car.setX(new_x);
+                        animator = ObjectAnimator.ofFloat(car, "x", new_x);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    case 2:
+                        new_y = (int) car.getY() + snap_grid_int;
+                        car.setY(new_y);
+                        animator = ObjectAnimator.ofFloat(car, "y", car.getY() + snap_grid_int);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    case 3:
+                        new_x = (int) car.getX() - snap_grid_int;
+                        car.setX(new_x);
+                        animator = ObjectAnimator.ofFloat(car, "x", new_x);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    default:
+                        // Shouldn't reach this case
+                        break;
+                }
+            }
+        });
+
+        ImageButton reverseButton = (ImageButton) findViewById(R.id.reverseButton);
+        reverseButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Log.d("COMMS DEBUG","reverse");
+
+                // Bluetooth message
+                if (BluetoothConnectionService.BluetoothConnectionStatus) {
+                    byte[] bytes = "STM:x".getBytes(Charset.defaultCharset());
+                    BluetoothConnectionService.write(bytes);
+                }
+
+                // Animation
+                int direction = (int) car.getRotation();
+                int new_x, new_y;
+                ObjectAnimator animator;
+                switch (((direction / 90) % 4 + 4) % 4) {
+                    case 0:
+                        new_y = (int) car.getY() + snap_grid_int;
+                        car.setY(new_y);
+                        animator = ObjectAnimator.ofFloat(car, "y", new_y);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    case 1:
+                        new_x = (int) car.getX() - snap_grid_int;
+                        car.setX(new_x);
+                        animator = ObjectAnimator.ofFloat(car, "x", new_x);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    case 2:
+                        new_y = (int) car.getY() - snap_grid_int;
+                        car.setY(new_y);
+                        animator = ObjectAnimator.ofFloat(car, "y", new_y);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    case 3:
+                        new_x = (int) car.getX() + snap_grid_int;
+                        car.setX(new_x);
+                        animator = ObjectAnimator.ofFloat(car, "x", new_x);
+                        animator.setDuration(animator_duration);
+                        animator.start();
+                        updateXYDirText();
+                        break;
+                    default:
+                        // Shouldn't reach this case
+                        break;
+                }
+            }
+        });
+
+        ImageButton leftButton = (ImageButton) findViewById(R.id.leftButton);
+        leftButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Log.d("COMMS DEBUG","left");
+                if (BluetoothConnectionService.BluetoothConnectionStatus) {
+                    byte[] bytes = "STM:a".getBytes(Charset.defaultCharset());
+                    BluetoothConnectionService.write(bytes);
+                }
+
+                int direction = (int) car.getRotation();
+                switch (((direction / 90) % 4 + 4) % 4) {
+                    case 0:
+                        car.setRotation(270);
+                        break;
+                    case 1:
+                        car.setRotation(0);
+                        break;
+                    case 2:
+                        car.setRotation(90);
+                        break;
+                    case 3:
+                        car.setRotation(180);
+                        break;
+                    default:
+                        // Shouldn't reach this case
+                        break;
+                }
+
+                updateXYDirText();
+            }
+        });
+
+        ImageButton rightButton = (ImageButton) findViewById(R.id.rightButton);
+        rightButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                Log.d("COMMS DEBUG", "right");
+                if (BluetoothConnectionService.BluetoothConnectionStatus) {
+                    byte[] bytes = "STM:d".getBytes(Charset.defaultCharset());
+                    BluetoothConnectionService.write(bytes);
+                }
+
+                int direction = (int) car.getRotation();
+                switch (((direction / 90) % 4 + 4) % 4) {
+                    case 0:
+                        car.setRotation(90);
+                        break;
+                    case 1:
+                        car.setRotation(180);
+                        break;
+                    case 2:
+                        car.setRotation(270);
+                        break;
+                    case 3:
+                        car.setRotation(0);
+                        break;
+                    default:
+                        // Shouldn't reach this case
+                        break;
+                }
+
+                updateXYDirText();
+            }
+        });
+    }
+
+    private void setObstacleImage(int obstacleNumber, String image) {
+        obstacles.get(obstacleNumber).setImageResource(rsc.get(image));
+        obstacles.get(obstacleNumber).setRotation(0);
+    }
+
+    TextView messageBox;
+
+    private void stopTimerButton() {
+        Chronometer IRTimer = (Chronometer) findViewById(R.id.IRTimer);
+        IRTimer.stop();
+    }
+
+    private void sendObstaclese() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append("RPI:")
+                .append(getObstacleString(obs1))
+                .append(getObstacleString(obs2))
+                .append(getObstacleString(obs3))
+                .append(getObstacleString(obs4))
+                .append(getObstacleString(obs5))
+                .append(getObstacleString(obs6))
+                .append(getObstacleString(obs7))
+                .append(getObstacleString(obs8));
+
+        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
+            Toast.makeText(this, stringBuilder.toString(), Toast.LENGTH_LONG).show();
+            byte[] bytes = stringBuilder.toString().getBytes(Charset.defaultCharset());
+            BluetoothConnectionService.write(bytes);
+
+        } else {
+            Toast.makeText(Arena.this, "Please connect to Bluetooth.", Toast.LENGTH_LONG).show();
+        }
+
+        Chronometer IRTimer = (Chronometer) findViewById(R.id.IRTimer);
+        long elapsedRealtime = SystemClock.elapsedRealtime();
+        IRTimer.setBase(elapsedRealtime);
+        IRTimer.start();
+    }
+
+    private void beginSPTask() {
+        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
+            byte[] bytes = "STM:sp".getBytes(Charset.defaultCharset());
+            BluetoothConnectionService.write(bytes);
+            Toast.makeText(Arena.this, "Shortest Path Started.", Toast.LENGTH_LONG).show();
+
+        } else {
+            Toast.makeText(Arena.this, "Please connect to Bluetooth.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void resetObstaclesButton() {
+        // Hard coded
+        obs1.setX(320);
+        obs1.setY(825);
+
+        obs2.setX(370);
+        obs2.setY(825);
+
+        obs3.setX(420);
+        obs3.setY(825);
+
+        obs4.setX(470);
+        obs4.setY(825);
+
+        obs5.setX(520);
+        obs5.setY(825);
+
+        obs6.setX(570);
+        obs6.setY(825);
+
+        obs7.setX(620);
+        obs7.setY(825);
+
+        obs8.setX(670);
+        obs8.setY(825);
+
+        car.setX(0);
+        car.setY(680);
+        car.setRotation(0);
+        updateXYDirText();
+
+        obs1.setImageResource(rsc.get("o1n"));
+        obs2.setImageResource(rsc.get("o2n"));
+        obs3.setImageResource(rsc.get("o3n"));
+        obs4.setImageResource(rsc.get("o4n"));
+        obs5.setImageResource(rsc.get("o5n"));
+        obs6.setImageResource(rsc.get("o6n"));
+        obs7.setImageResource(rsc.get("o7n"));
+        obs8.setImageResource(rsc.get("o8n"));
+
+        obs1.setRotation(0);
+        obs2.setRotation(0);
+        obs3.setRotation(0);
+        obs4.setRotation(0);
+        obs5.setRotation(0);
+        obs6.setRotation(0);
+        obs7.setRotation(0);
+        obs8.setRotation(0);
+
+        Toast.makeText(this, "Map Reset", Toast.LENGTH_LONG).show();
+    }
+
+    private void setPreset1Button() {
+        obs1.setX(600);
+        obs1.setY(200);
+        obs1.setRotation(180);
+        obs1.setImageResource(rsc.get("o1s"));
+
+        obs2.setX(600);
+        obs2.setY(600);
+        obs2.setImageResource(rsc.get("o2n"));
+
+        obs3.setX(480);
+        obs3.setY(400);
+        obs3.setRotation(90);
+        obs3.setImageResource(rsc.get("o3e"));
+
+        obs4.setX(240);
+        obs4.setY(280);
+        obs4.setRotation(270);
+        obs4.setImageResource(rsc.get("o4w"));
+
+        obs5.setX(240);
+        obs5.setY(480);
+        obs5.setRotation(180);
+        obs5.setImageResource(rsc.get("o5s"));
+
+        Toast.makeText(this, "Preset 1 Applied", Toast.LENGTH_LONG).show();
+    }
+
+    private void setPreset2Button() {
+        obs1.setX(280);
+        obs1.setY(360);
+        obs1.setRotation(180);
+        obs1.setImageResource(rsc.get("o1s"));
+
+        obs2.setX(720);
+        obs2.setY(560);
+        obs2.setRotation(270);
+        obs2.setImageResource(rsc.get("o2w"));
+
+        obs3.setX(480);
+        obs3.setY(400);
+        obs3.setRotation(90);
+        obs3.setImageResource(rsc.get("o3e"));
+
+        Toast.makeText(this, "Preset 2 Applied", Toast.LENGTH_LONG).show();
+    }
+
+    private void setPreset3Button() {
+        obs1.setX(200);
+        obs1.setY(360);
+        obs1.setRotation(270);
+        obs1.setImageResource(rsc.get("o1w"));
+
+        obs2.setX(400);
+        obs2.setY(160);
+        obs2.setRotation(270);
+        obs2.setImageResource(rsc.get("o2w"));
+
+        obs3.setX(720);
+        obs3.setY(320);
+        obs3.setRotation(0);
+        obs3.setImageResource(rsc.get("o3n"));
+
+        obs4.setX(400);
+        obs4.setY(520);
+        obs4.setRotation(180);
+        obs4.setImageResource(rsc.get("o4s"));
+
+        Toast.makeText(this, "Preset 3 Applied", Toast.LENGTH_LONG).show();
+    }
+
+    private String getObstacleString(ImageView obstacle) {
+        if((int) (obstacle.getX() / 40) > 19 || ((int) obstacle.getY() / 40) > 19){
+            return "";
+        }
+        else {
+            return ((int) obstacle.getX() / 40) + "," + ((int) obstacle.getY() / 40) + "," + getImagedirection(obstacle) + ",";
+        }
+    }
+
+    private String getImagedirection(ImageView obstacle) {
+        switch (((int) ((obstacle.getRotation() / 90) % 4 + 4) % 4)) {
+            case 0:
+                return "N";
+            case 1:
+                return "E";
+            case 2:
+                return "S";
+            case 3:
+                return "W";
+            default:
+                return "X";
+        }
+    }
+
+    private void updateRobotPosition(int x, int y, int direction) {
+        car.setX(x * snap_grid_int - snap_grid_int);
+        car.setY(y * snap_grid_int - snap_grid_int);
+        switch (direction) {
+            case 7: // North-west
+                car.setRotation(315);
+                break;
+            case 0: // North
+                car.setRotation(0);
+                break;
+            case 1: // North-east
+                car.setRotation(45);
+                break;
+            case 2: // East
+                car.setRotation(90);
+                break;
+            case 3: // South-east
+                car.setRotation(135);
+                break;
+            case 4: // South
+                car.setRotation(180);
+                break;
+            case 5: // South-west
+                car.setRotation(225);
+                break;
+            case 6: // West
+                car.setRotation(270);
+                break;
+            default:
+                // Shouldn't reach this case
+                break;
+        }
+
+        updateXYDirText();
+    }
+
+    private void updateXYDirText() {
+        int x = (int) (car.getX() + snap_grid_int)/snap_grid_int;
+        int y = (int) (car.getY() + snap_grid_int)/snap_grid_int;
+        car_x.setText(String.valueOf(x));
+        car_y.setText(String.valueOf(y));
+
+        int direction = (int)car.getRotation();
+
+        if (direction == 315)
+            car_dir.setText("North-West");
+        else if (direction == 0)
+            car_dir.setText("North");
+        else if (direction == 45)
+            car_dir.setText("North-East");
+        else if (direction == 90)
+            car_dir.setText("East");
+        else if (direction == 135)
+            car_dir.setText("South-East");
+        else if (direction == 180)
+            car_dir.setText("South");
+        else if (direction == 225)
+            car_dir.setText("South-West");
+        else if (direction == 270)
+            car_dir.setText("West");
+        else
+            car_dir.setText("None");
+    }
+
+    // Broadcast Receiver for incoming message
+    BroadcastReceiver myReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("receivedMessage");
+            Log.d("Received message: ", message);
+            Log.d("check", "printing of received msg done" );
+
+            String command = message.substring(0, message.indexOf(','));
+
+            switch (command) {
+                case "ROBOT":
+                    int startingIndex = message.indexOf("<");
+                    int endingIndex = message.indexOf(">");
+                    String x = message.substring(startingIndex + 1, endingIndex);
+
+                    startingIndex = message.indexOf("<", endingIndex+1);
+                    endingIndex = message.indexOf(">", endingIndex+1);
+                    String y = message.substring(startingIndex+1, endingIndex);
+
+                    startingIndex = message.indexOf("<", endingIndex+1);
+                    endingIndex = message.indexOf(">", endingIndex+1);
+                    String direction = message.substring(startingIndex+1, endingIndex);
+
+                    Log.d("ROBOT", "(x: " + x + ") (y: " + y + ") (direction: " + direction + ")");
+
+                    updateRobotPosition(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(direction));
+                    break;
+                case "TARGET":
+                    int obstacleNumber = Character.getNumericValue(message.charAt(7));
+                    String solution = message.substring(9);
+                    setObstacleImage(obstacleNumber,solution);
+
+                    break;
+                case "STATUS":
+                    String msg = message.substring(message.indexOf(',')+1);
+                    messageBox.setText("\n[ROBOT]: " + msg);
+                case "STOP":
+                    Chronometer IRTimer = (Chronometer) findViewById(R.id.IRTimer);
+                    IRTimer.stop();
+                default:
+                    break;
+            }
+
+        }
+    };
+}
